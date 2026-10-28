@@ -9,3 +9,4 @@ forge-core = { path = "../forge-core" }
 forge-change = { path = "../forge-change" }
 forge-state = { path = "../forge-state" }
 serde.workspace = true
+thiserror.workspace = true
