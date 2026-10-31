@@ -599,6 +599,12 @@ mod tests {
     fn evidence_is_queryable_by_change() {
         let storage = Storage::open_in_memory().unwrap();
         storage
+            .upsert_resource(
+                "docker://container/api", "docker", "container", "{}",
+                "2026-01-01T00:00:00Z", "docker",
+            )
+            .unwrap();
+        storage
             .insert_change(
                 "chg_test1", "docker://container/api", "update", "{}", "{}", "user", None,
                 "2026-01-01T00:00:00Z", 1.0,
@@ -637,6 +643,12 @@ mod extra_tests {
     #[test]
     fn plan_and_action_roundtrip() {
         let storage = Storage::open_in_memory().unwrap();
+        storage
+            .upsert_resource(
+                "fs://file/a.txt", "filesystem", "file", "{}",
+                "2026-01-01T00:00:00Z", "filesystem",
+            )
+            .unwrap();
         storage
             .insert_change(
                 "chg_x", "fs://file/a.txt", "update", "{}", "{}", "user", None,
@@ -688,6 +700,12 @@ mod extra_tests {
     #[test]
     fn list_changes_orders_newest_first() {
         let storage = Storage::open_in_memory().unwrap();
+        storage
+            .upsert_resource(
+                "fs://file/a", "filesystem", "file", "{}",
+                "2026-01-01T00:00:00Z", "filesystem",
+            )
+            .unwrap();
         storage
             .insert_change("chg_1", "fs://file/a", "update", "{}", "{}", "user", None, "2026-01-01T00:00:00Z", 1.0)
             .unwrap();

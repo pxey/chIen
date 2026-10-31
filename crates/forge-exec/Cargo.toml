@@ -11,3 +11,4 @@ forge-state = { path = "../forge-state" }
 forge-compensate = { path = "../forge-compensate" }
 serde.workspace = true
 serde_json.workspace = true
+thiserror.workspace = true

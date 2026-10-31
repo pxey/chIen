@@ -72,8 +72,10 @@ impl ResourceId {
         let raw = raw.into();
         let has_scheme_sep = raw.find("://").map(|i| i > 0).unwrap_or(false);
         let after_scheme = raw.split("://").nth(1).unwrap_or("");
-        let has_kind_and_id = after_scheme.splitn(2, '/').count() == 2
-            && !after_scheme.splitn(2, '/').next().unwrap_or("").is_empty();
+        let mut segments = after_scheme.splitn(2, '/');
+        let kind = segments.next().unwrap_or("");
+        let id = segments.next().unwrap_or("");
+        let has_kind_and_id = !kind.is_empty() && !id.is_empty();
 
         if !has_scheme_sep || !has_kind_and_id {
             return Err(crate::ForgeError::InvalidResourceId(raw));
@@ -123,6 +125,11 @@ mod tests {
     #[test]
     fn resource_id_rejects_missing_id_segment() {
         assert!(ResourceId::parse("docker://container").is_err());
+    }
+
+    #[test]
+    fn resource_id_rejects_empty_id_segment() {
+        assert!(ResourceId::parse("docker://container/").is_err());
     }
 
     #[test]
