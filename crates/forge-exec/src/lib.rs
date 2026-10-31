@@ -172,6 +172,52 @@ mod tests {
     }
 
     #[test]
+    fn failed_action_prevents_commit_even_when_verification_passes() {
+        let plan = approved_plan();
+        let mut exec = Execution::begin(&plan).unwrap();
+        exec.record_action_result(ActionResult {
+            action: ActionId::new(),
+            status: ActionStatus::Failed,
+            output: Value::String("action failed".into()),
+        })
+        .unwrap();
+
+        exec.begin_verification();
+        exec.complete_with_verification(true);
+
+        assert_eq!(exec.state(), ExecutionState::Failed);
+    }
+
+    #[test]
+    fn terminal_execution_rejects_additional_action_results() {
+        let plan = approved_plan();
+        let mut exec = Execution::begin(&plan).unwrap();
+        exec.begin_verification();
+        exec.complete_with_verification(true);
+
+        let result = ActionResult {
+            action: ActionId::new(),
+            status: ActionStatus::Succeeded,
+            output: Value::Null,
+        };
+        assert!(matches!(
+            exec.record_action_result(result),
+            Err(ExecError::AlreadyFinished)
+        ));
+    }
+
+    #[test]
+    fn compensation_cannot_begin_before_execution_fails() {
+        let plan = approved_plan();
+        let mut exec = Execution::begin(&plan).unwrap();
+
+        assert!(matches!(
+            exec.begin_compensation(),
+            Err(ExecError::NotExecutable)
+        ));
+    }
+
+    #[test]
     fn compensation_that_cannot_complete_is_compensation_failed() {
         let plan = approved_plan();
         let mut exec = Execution::begin(&plan).unwrap();
